@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>WebSocket Chat</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<div class="chat-container">
+    <h2>WebSocket Real-Time Chat</h2>
+    
+    <div id="messages"></div>
+    
+    <div class="input-area">
+        <input id="message" type="text" placeholder="Type message..." autocomplete="off">
+        <button onclick="sendMessage()">Send</button>
+    </div>
+</div>
+<script>
+    const socket = new WebSocket("ws://" + window.location.host + "/ws");
+    socket.onmessage = function(event) {
+        const messages = document.getElementById("messages");
+        const message = document.createElement("div");
+        message.className = "message";
+        message.textContent = event.data;
+        messages.appendChild(message);
+        messages.scrollTop = messages.scrollHeight;
+    };
+    function sendMessage() {
+        const input = document.getElementById("message");
+        if (input.value.trim() !== "") {
+            socket.send(input.value);
+            input.value = "";
+        }
+    }
+    document.getElementById("message")
+        .addEventListener("keypress", function(e) {
+            if (e.key === "Enter") {
+                sendMessage();
+            }
+        });
+</script>
+</body>
+</html>
